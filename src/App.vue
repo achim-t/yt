@@ -1,18 +1,17 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <VideoGrid />
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import VideoGrid from './components/VideoGrid.vue'
 
 export default {
   name: 'app',
   components: {
-    HelloWorld
-  }
+    VideoGrid,
+  },
 }
 </script>
 
