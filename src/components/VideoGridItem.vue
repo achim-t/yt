@@ -18,7 +18,7 @@
           <div class="channel-title">{{ video.channelTitle }}</div>
           <div class="view-and-time">
             {{ video.viewCount }} views • {{ publishedAt }}
-          </div>
+          </div> 
           <div class="show-max-two-lines">{{ video.description }}</div>
         </div>
       </div>
