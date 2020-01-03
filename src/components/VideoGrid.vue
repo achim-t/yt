@@ -1,6 +1,6 @@
 <template>
   <div class="video-grid">
-    <VideoGridItem :video="video" v-for="video in videos" :key="video.id" />
+    <VideoGridItem :video="video" v-for="video in sorted" :key="video._id" />
   </div>
 </template>
 
@@ -11,12 +11,15 @@ import axios from "axios";
 export default {
   data() {
     return {
-      videos: {}
+      videos: []
     };
   },
   components: { VideoGridItem },
   mounted() {
-    this.getVideos("UCLNgu_OupwoeESgtab33CCw");
+    // this.getVideos("UCouyFdE9-Lrjo3M_2idKq1A");
+  },
+  pouch: {
+    videos: {}
   },
   methods: {
     getVideos(channelId) {
@@ -47,17 +50,22 @@ export default {
         })
         .then(
           res =>
-            (this.videos = res.data.items.map(item => {
+            (this.videos = res.data.items.forEach(item => {
               const video = {
-                id: item.id.videoId,
+                _id: item.id.videoId,
                 ...item.snippet,
                 thumbnail: item.snippet.thumbnails.medium.url
               };
 
-              video.id = item.id.videoId;
-              return video;
+              this.$pouch.put(video)
+              
             }))
         );
+    }
+  },
+  computed: {
+    sorted() {
+      return [...this.videos].sort((a, b)=>a.publishedAt < b.publishedAt?1:-1)
     }
   }
 };

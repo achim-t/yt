@@ -19,7 +19,7 @@
           <div class="view-and-time">
             {{ video.viewCount }} views • {{ publishedAt }}
           </div> 
-          <div class="show-max-two-lines">{{ video.description }}</div>
+          <!-- <div class="show-max-two-lines">{{ video.description }}</div> -->
         </div>
       </div>
     </div>

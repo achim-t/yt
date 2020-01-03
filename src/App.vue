@@ -16,7 +16,7 @@ export default {
     EnterApiKey,
   },
   mounted() {
-    this.loadYoutubeApi()
+    //this.loadYoutubeApi()
   },
   methods: {
     loadYoutubeApi() {
