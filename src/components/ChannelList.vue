@@ -12,31 +12,26 @@ export default {
   pouch: {
     channels() {
       return {
-        database: 'yt_pouch',
+        database: "yt_pouch",
         selector: { kind: "youtube#channel" },
-        sort: ['sortTitle']
+        sort: ["sortTitle"]
       };
     }
-    
-    
-  },
-  // computed: {
-  //   channels() {
-  //     return this.yt_pouch;
-  //   }
-  // }
-
+  }
 };
 </script>
 
 <style>
 .channel-list {
   width: 17rem;
+  height: 100%;
   position: fixed;
-  overflow-y: auto;
+  overflow: scroll;
+  padding-bottom: 2em;
+  margin-top: 60px;
 }
 
 .channel-list ::-webkit-scrollbar {
-    width: 6px;
+  width: 6px;
 }
 </style>

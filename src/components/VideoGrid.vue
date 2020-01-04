@@ -36,8 +36,8 @@ export default {
   display: flex;
   flex-wrap: wrap;
 
-  padding-left: 17rem;
-  margin-left: 4px;
+  margin-left: 17rem;
+  padding-left: 4px;
   margin-bottom: 24px;
 }
 </style>

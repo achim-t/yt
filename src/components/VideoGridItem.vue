@@ -49,6 +49,7 @@ export default {
   text-align: left;
   margin-right: 4px;
   margin-bottom: 24px;
+  margin-top: 60px;
 }
 
 .image-container {

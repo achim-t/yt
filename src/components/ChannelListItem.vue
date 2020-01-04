@@ -16,8 +16,11 @@ export default {
   width: 100%;
   display: flex;
   align-items: center;
-  padding: 1em 1em;
+  padding: .5em 1em;
   font-weight: 400;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .channel-list-item img {
   margin-right: 24px;

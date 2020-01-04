@@ -20,7 +20,6 @@ export default {
     EnterApiKey
   },
   mounted() {
-    //this.loadYoutubeApi()
     this.getVideos("UCu17Sme-KE87ca9OTzP0p7g");
     this.getChannels();
   },
@@ -42,37 +41,37 @@ export default {
       document.body.appendChild(script);
     },
     async getChannels() {
-      const channelId = 'UCxthdj6BtozwYyvhKa4cgSQ'
+      const channelId = "UCxthdj6BtozwYyvhKa4cgSQ";
       let params = {
-
         part: "snippet",
         channelId,
-        maxResults: 50,
-        fields: "kind,nextPageToken,items(snippet(resourceId,title,description,thumbnails/medium))",
-        key: localStorage.API_KEY,
-
+        fields:
+          "kind,nextPageToken,items(snippet(resourceId,title,description,thumbnails/medium))",
+        key: localStorage.API_KEY
       };
-      const response = await axios.get(
-        "https://www.googleapis.com/youtube/v3/subscriptions",
-        {
-          params: this.removeEmptyParams(params)
+      do {
+         const response = await axios.get(
+          "https://www.googleapis.com/youtube/v3/subscriptions",
+          {
+            params: this.removeEmptyParams(params)
+          }
+        );
+        const items = response.data.items;
+        params.pageToken = response.data.nextPageToken;
+
+        for (const item of items) {
+          const channel = {
+            ...item.snippet,
+            ...item.snippet.resourceId,
+            thumbnail: item.snippet.thumbnails.medium.url
+          };
+          delete channel.thumbnails;
+          delete channel.resourceId;
+          channel._id = channel.channelId;
+          channel.sortTitle = channel.title.toUpperCase();
+          this.$pouch.get(channel._id).catch(() => this.$pouch.put(channel));
         }
-      );
-      for (const item of response.data.items) {
-        const channel = {
-          ...item.snippet,
-          ...item.snippet.resourceId,
-          thumbnail: item.snippet.thumbnails.medium.url,
-        };
-        delete channel.thumbnails;
-        delete channel.resourceId;
-        channel._id = channel.channelId;
-        channel.sortTitle = channel.title.toUpperCase()
-        this.$pouch.get(channel._id).catch(() => this.$pouch.put(channel));
-      }
-
-
-
+      } while (typeof params.pageToken !== "undefined");
     },
     removeEmptyParams(params) {
       for (let p in params) {
@@ -123,6 +122,5 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
 }
 </style>
