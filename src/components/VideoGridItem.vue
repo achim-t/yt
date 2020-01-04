@@ -1,5 +1,5 @@
 <template>
-  <a :href="`https://www.youtube.com/watch?v=${video.id}`">
+  <a :href="`https://www.youtube.com/watch?v=${video._id}`">
     <div class="video-preview">
       <div class="image-container">
         <img :src="video.thumbnail" alt="video thumbnail" />
@@ -11,14 +11,10 @@
         </div>
       </div>
       <div class="video-info">
-        <div class="semi-bold show-max-two-lines" :title="video.title">
-          {{ video.title }}
-        </div>
+        <div class="semi-bold show-max-two-lines" v-html="video.title" :title="unescape(video.title)"></div>
         <div class="video-preview-metadata-container">
           <div class="channel-title">{{ video.channelTitle }}</div>
-          <div class="view-and-time">
-            {{ video.viewCount }} views • {{ publishedAt }}
-          </div> 
+          <div class="view-and-time">{{ video.viewCount }} views • {{ publishedAt }}</div>
           <!-- <div class="show-max-two-lines">{{ video.description }}</div> -->
         </div>
       </div>
@@ -27,16 +23,23 @@
 </template>
 
 <script>
-import { format } from 'timeago.js'
+import { format } from "timeago.js";
 
 export default {
-  props: ['video'],
+  props: ["video"],
   computed: {
     publishedAt() {
-      return format(this.video.publishedAt)
-    },
+      return format(this.video.publishedAt);
+    }
   },
-}
+  methods: {
+    unescape(str) {
+      const textArea = document.createElement("textarea");
+      textArea.innerHTML = str;
+      return textArea.value;
+    }
+  }
+};
 </script>
 
 <style>

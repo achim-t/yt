@@ -1,73 +1,33 @@
 <template>
-  <div class="video-grid">
-    <VideoGridItem :video="video" v-for="video in sorted" :key="video._id" />
+  <div>
+    <input v-model="channelId" />
+    <div class="video-grid">
+      <VideoGridItem :video="video" v-for="video in videos" :key="video._id" />
+    </div>
   </div>
 </template>
 
 <script>
 import VideoGridItem from "./VideoGridItem";
-import axios from "axios";
 
 export default {
   data() {
     return {
-      videos: []
+      channelId: "",
     };
   },
   components: { VideoGridItem },
-  mounted() {
-    // this.getVideos("UCouyFdE9-Lrjo3M_2idKq1A");
-  },
   pouch: {
-    videos: {}
-  },
-  methods: {
-    getVideos(channelId) {
-      const removeEmptyParams = params => {
-        for (let p in params) {
-          if (!params[p] || params[p] === "undefined") {
-            delete params[p];
-          }
-        }
-        return params;
+    videos() {
+      const selector = { kind: "youtube#video" };
+      if (this.channelId) selector.channelId = this.channelId;
+      return {
+        database: 'yt_pouch',
+        sort: [{ publishedAt: "desc" }],
+        selector
       };
-
-      const params = {
-        url: "search",
-        part: "snippet",
-        channelId,
-        order: "date",
-        pageToken: "",
-        publishedAfter: "",
-        type: "video",
-        key: localStorage.API_KEY,
-        fields:
-          "kind,nextPageToken,items(id,snippet(channelId,channelTitle,publishedAt,title,description,thumbnails/medium))"
-      };
-      axios
-        .get("https://www.googleapis.com/youtube/v3/search", {
-          params: removeEmptyParams(params)
-        })
-        .then(
-          res =>
-            (this.videos = res.data.items.forEach(item => {
-              const video = {
-                _id: item.id.videoId,
-                ...item.snippet,
-                thumbnail: item.snippet.thumbnails.medium.url
-              };
-
-              this.$pouch.put(video)
-              
-            }))
-        );
     }
   },
-  computed: {
-    sorted() {
-      return [...this.videos].sort((a, b)=>a.publishedAt < b.publishedAt?1:-1)
-    }
-  }
 };
 </script>
 
@@ -76,6 +36,7 @@ export default {
   display: flex;
   flex-wrap: wrap;
 
+  padding-left: 17rem;
   margin-left: 4px;
   margin-bottom: 24px;
 }

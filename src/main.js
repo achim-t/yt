@@ -13,7 +13,7 @@ PouchDB.plugin(plf)
 Vue.config.productionTip = false
 Vue.use(PouchVue, {
   pouch: PouchDB,
-  defaultDB: 'videos'
+  defaultDB: 'yt_pouch'
 })
 
 new Vue({
