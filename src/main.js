@@ -4,6 +4,7 @@ import PouchVue from 'pouch-vue'
 import PouchDB from 'pouchdb-browser'
 import pf from 'pouchdb-find'
 import plf from 'pouchdb-live-find'
+import vuetify from './plugins/vuetify';
 
 PouchDB.plugin(pf)
 PouchDB.plugin(plf)
@@ -17,5 +18,6 @@ Vue.use(PouchVue, {
 })
 
 new Vue({
-  render: h => h(App),
+  vuetify,
+  render: h => h(App)
 }).$mount('#app')

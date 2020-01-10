@@ -1,7 +1,7 @@
 <template>
-  <a :href="`https://www.youtube.com/watch?v=${video._id}`">
-    <div class="video-preview">
-      <div class="image-container">
+  <div class="video-preview">
+    <div class="image-container">
+      <a :href="`https://www.youtube.com/watch?v=${video._id}`">
         <img :src="video.thumbnail" alt="video thumbnail" />
         <div class="time-label">
           <span>{{ video.duration }}</span>
@@ -9,17 +9,17 @@
         <div class="mark-watched">
           <i class="check icon"></i>
         </div>
-      </div>
-      <div class="video-info">
-        <div class="semi-bold show-max-two-lines" v-html="video.title" :title="unescape(video.title)"></div>
-        <div class="video-preview-metadata-container">
-          <div class="channel-title">{{ video.channelTitle }}</div>
-          <div class="view-and-time">{{ video.viewCount }} views • {{ publishedAt }}</div>
-          <!-- <div class="show-max-two-lines">{{ video.description }}</div> -->
-        </div>
+      </a>
+    </div>
+    <div class="video-info">
+      <div class="semi-bold show-max-two-lines" v-html="video.title" :title="unescape(video.title)"></div>
+      <div class="video-preview-metadata-container">
+        <div class="channel-title">{{ video.channelTitle }}</div>
+        <div class="view-and-time">{{ video.viewCount }} views • {{ publishedAt }}</div>
+        <!-- <div class="show-max-two-lines">{{ video.description }}</div> -->
       </div>
     </div>
-  </a>
+  </div>
 </template>
 
 <script>
@@ -44,12 +44,13 @@ export default {
 
 <style>
 .video-preview {
-  display: grid;
+  display: inline-block;
   grid: 118px auto / 210px;
   text-align: left;
   margin-right: 4px;
   margin-bottom: 24px;
-  margin-top: 60px;
+  width: 210px;
+  /* margin-top: 60px; */
 }
 
 .image-container {

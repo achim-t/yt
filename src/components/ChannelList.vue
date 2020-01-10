@@ -1,7 +1,14 @@
 <template>
-  <div class="channel-list">
-    <ChannelListItem v-for="channel in channels" :channel="channel" :key="channel._id" />
-  </div>
+  <v-list dense>
+    <v-list-item-group v-model="selected">
+      <ChannelListItem
+        v-for="(channel,i) in channels"
+        :channel="channel"
+        :key="i+1"
+        @click.native="$emit('channelChanged',channel._id)"
+      />
+    </v-list-item-group>
+  </v-list>
 </template>
 
 <script>
@@ -17,21 +24,17 @@ export default {
         sort: ["sortTitle"]
       };
     }
+  },
+  data() {
+    return {
+      dummyChannel: {
+        _id: "",
+        title: "All"
+      },
+      drawer: null,
+      selected: undefined
+    };
   }
 };
 </script>
 
-<style>
-.channel-list {
-  width: 17rem;
-  height: 100%;
-  position: fixed;
-  overflow: scroll;
-  padding-bottom: 2em;
-  margin-top: 60px;
-}
-
-.channel-list ::-webkit-scrollbar {
-  width: 6px;
-}
-</style>

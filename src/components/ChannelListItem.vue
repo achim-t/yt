@@ -1,31 +1,16 @@
 <template>
-  <div class="channel-list-item">
-    <img :src="channel.thumbnail">
-    {{channel.title}}
-  </div>
+  <v-list-item link active>
+    <v-list-item-avatar>
+      <img v-if="channel.thumbnail" :src="channel.thumbnail">
+    </v-list-item-avatar>
+    <v-list-item-title v-text="channel.title"/>
+    
+  </v-list-item>
 </template>
 
 <script>
 export default {
-  props: ["channel"]
+  props: ["channel", "active"]
 }
 </script>
 
-<style>
-.channel-list-item {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  padding: .5em 1em;
-  font-weight: 400;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.channel-list-item img {
-  margin-right: 24px;
-  height: 24px;
-  width: 24px;
-  border-radius: 50%;
-}
-</style>

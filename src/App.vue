@@ -1,9 +1,25 @@
 <template>
-  <div id="app">
+  <v-app>
     <EnterApiKey />
-    <ChannelList />
-    <VideoGrid />
-  </div>
+    <v-navigation-drawer v-model="drawer" app clipped>
+      <template v-slot:prepend>
+        <v-subheader link @click="channelChanged('')">SUBSCRIPTIONS</v-subheader>
+      </template>
+      <ChannelList @channelChanged="channelChanged" />
+    </v-navigation-drawer>
+
+    <v-app-bar app clipped-left color="red" dense>
+      <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
+      <v-icon class="mx-4">fab fa-youtube</v-icon>
+      <v-toolbar-title class="mr-12 align-center">
+        <span class="title">YoutubeGrid</span>
+      </v-toolbar-title>
+    </v-app-bar>
+
+    <v-content>
+      <VideoGrid :channelId="currentChannel" />
+    </v-content>
+  </v-app>
 </template>
 
 <script>
@@ -13,17 +29,25 @@ import ChannelList from "./components/ChannelList";
 import axios from "axios";
 
 export default {
-  name: "app",
+  name: "App",
+
   components: {
     ChannelList,
     VideoGrid,
     EnterApiKey
   },
+  data: () => ({
+    drawer: null,
+    currentChannel: ""
+  }),
   mounted() {
     this.getVideos("UCu17Sme-KE87ca9OTzP0p7g");
     this.getChannels();
   },
   methods: {
+    channelChanged(channelId) {
+      this.currentChannel = channelId;
+    },
     loadYoutubeApi() {
       if (!localStorage.API_KEY || localStorage.API_KEY === "") return;
       const script = document.createElement("script");
@@ -50,7 +74,7 @@ export default {
         key: localStorage.API_KEY
       };
       do {
-         const response = await axios.get(
+        const response = await axios.get(
           "https://www.googleapis.com/youtube/v3/subscriptions",
           {
             params: this.removeEmptyParams(params)
@@ -114,13 +138,3 @@ export default {
   }
 };
 </script>
-
-<style>
-#app {
-  font-family: "Avenir", Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
-</style>

@@ -1,21 +1,16 @@
 <template>
-  <div>
-    <input v-model="channelId" />
-    <div class="video-grid">
+   <v-container>
+    <!-- <input v-model="channelId" /> -->
       <VideoGridItem :video="video" v-for="video in videos" :key="video._id" />
-    </div>
-  </div>
+   </v-container>
 </template>
 
 <script>
 import VideoGridItem from "./VideoGridItem";
 
 export default {
-  data() {
-    return {
-      channelId: "",
-    };
-  },
+
+  props: ['channelId'],
   components: { VideoGridItem },
   pouch: {
     videos() {
@@ -31,13 +26,3 @@ export default {
 };
 </script>
 
-<style>
-.video-grid {
-  display: flex;
-  flex-wrap: wrap;
-
-  margin-left: 17rem;
-  padding-left: 4px;
-  margin-bottom: 24px;
-}
-</style>
