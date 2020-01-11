@@ -8,9 +8,9 @@
       <ChannelList @channelChanged="channelChanged" />
     </v-navigation-drawer>
 
-    <v-app-bar app clipped-left color="red" dense>
+    <v-app-bar app clipped-left color="red" dense dark>
       <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
-      <v-icon class="mx-4">fab fa-youtube</v-icon>
+      <v-icon class="mx-4">mdi-youtube</v-icon>
       <v-toolbar-title class="mr-12 align-center">
         <span class="title">YoutubeGrid</span>
       </v-toolbar-title>

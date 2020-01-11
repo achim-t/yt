@@ -1,25 +1,42 @@
 <template>
-  <div class="video-preview">
-    <div class="image-container">
-      <a :href="`https://www.youtube.com/watch?v=${video._id}`">
-        <img :src="video.thumbnail" alt="video thumbnail" />
-        <div class="time-label">
-          <span>{{ video.duration }}</span>
-        </div>
-        <div class="mark-watched">
-          <i class="check icon"></i>
-        </div>
+  <v-hover v-slot:default="{hover}">
+    <v-card width="210px" flat :class="{watched}" class="d-inline-block mr-2">
+      <a :href="url" target="_blank" @click="onClick">
+        <v-img :src="video.thumbnail">
+          <v-card-title>
+            <v-row class="fill-height flex-column">
+              <div class="align-self-end">
+                <v-btn
+                  icon
+                  @click.prevent.stop="toggleWatched"
+                  :title="watched?'mark as unwatched':'mark as watched'"
+                >
+                  <v-icon :class="{'show-btns': hover}" :color="transparent">mdi-check</v-icon>
+                </v-btn>
+              </div>
+            </v-row>
+            <div class="time-label" :class="{'hidden': hover}">
+              <span>12:34</span>
+            </div>
+          </v-card-title>
+        </v-img>
       </a>
-    </div>
-    <div class="video-info">
-      <div class="semi-bold show-max-two-lines" v-html="video.title" :title="unescape(video.title)"></div>
-      <div class="video-preview-metadata-container">
-        <div class="channel-title">{{ video.channelTitle }}</div>
-        <div class="view-and-time">{{ video.viewCount }} views • {{ publishedAt }}</div>
-        <!-- <div class="show-max-two-lines">{{ video.description }}</div> -->
-      </div>
-    </div>
-  </div>
+      <v-card-subtitle>
+        <div class="video-info">
+          <div
+            class="semi-bold show-max-two-lines"
+            v-html="video.title"
+            :title="unescape(video.title)"
+          ></div>
+          <div class="video-preview-metadata-container">
+            <div class="channel-title">{{ video.channelTitle }}</div>
+            <div class="view-and-time">{{ video.viewCount }} views • {{ publishedAt }}</div>
+            <!-- <div class="show-max-two-lines">{{ video.description }}</div> -->
+          </div>
+        </div>
+      </v-card-subtitle>
+    </v-card>
+  </v-hover>
 </template>
 
 <script>
@@ -30,6 +47,9 @@ export default {
   computed: {
     publishedAt() {
       return format(this.video.publishedAt);
+    },
+    url() {
+      return `https://www.youtube.com/watch?v=${this.video._id}`;
     }
   },
   methods: {
@@ -37,34 +57,32 @@ export default {
       const textArea = document.createElement("textarea");
       textArea.innerHTML = str;
       return textArea.value;
+    },
+    toggleWatched() {
+      this.watched = !this.watched;
+    },
+    onClick() {
+      this.watched = true;
     }
-  }
+  },
+  data: () => ({
+    transparent: "rgba(255, 255, 255, 0)",
+    watched: false
+  })
 };
 </script>
-
-<style>
-.video-preview {
-  display: inline-block;
-  grid: 118px auto / 210px;
-  text-align: left;
-  margin-right: 4px;
-  margin-bottom: 24px;
-  width: 210px;
-  /* margin-top: 60px; */
+<style scoped>
+.v-card.watched {
+  opacity: 0.2;
 }
 
-.image-container {
-  position: relative;
-  grid-row: 1 /2;
-  grid-column: 1/2;
+.show-btns {
+  color: rgba(255, 255, 255, 1) !important;
+  background: black;
 }
 
-.image-container:hover .time-label {
+.hidden {
   display: none;
-}
-
-.image-container:hover .mark-watched {
-  display: inline;
 }
 
 .time-label {
@@ -107,25 +125,5 @@ export default {
 
 .semi-bold {
   font-weight: 600;
-}
-
-img {
-  max-width: 100%;
-  max-height: 100%;
-}
-
-.mark-watched {
-  position: absolute;
-  display: none;
-  color: white;
-  background: black;
-  bottom: 5px;
-  right: 5px;
-  cursor: pointer;
-  padding: 2px;
-  border-style: solid;
-  border-width: 1px;
-  border-radius: 2px;
-  border-color: #333;
 }
 </style>
