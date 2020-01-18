@@ -10,16 +10,20 @@ import VideoGridItem from "./VideoGridItem";
 
 export default {
 
-  props: ['channelId'],
+  props: ['channelId', 'showWatched'],
   components: { VideoGridItem },
   pouch: {
     videos() {
       const selector = { kind: "youtube#video" };
+      if (!this.showWatched) { 
+        selector["$not"] = {"$or": [{watched: true},{"$exists": "watched"} ]}
+      }
       if (this.channelId) selector.channelId = this.channelId;
       return {
         database: 'yt_pouch',
         sort: [{ publishedAt: "desc" }],
-        selector
+        selector,
+        limit: 100
       };
     }
   },

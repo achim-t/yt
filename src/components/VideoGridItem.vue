@@ -1,7 +1,13 @@
 <template>
   <v-hover v-slot:default="{hover}">
-    <v-card width="210px" flat :class="{watched}" class="d-inline-block mr-2">
-      <a :href="url" target="_blank" @click="onClick">
+    <v-card
+      width="210px"
+      flat
+      :class="{watched: video.watched}"
+      class="d-inline-block mr-2"
+      :key="componentKey"
+    >
+      <a :href="url" target="_blank" @click="setWatched(true)">
         <v-img :src="video.thumbnail">
           <v-card-title>
             <v-row class="fill-height flex-column">
@@ -9,7 +15,7 @@
                 <v-btn
                   icon
                   @click.prevent.stop="toggleWatched"
-                  :title="watched?'mark as unwatched':'mark as watched'"
+                  :title="video.watched?'mark as unwatched':'mark as watched'"
                 >
                   <v-icon :class="{'show-btns': hover}" :color="transparent">mdi-check</v-icon>
                 </v-btn>
@@ -31,7 +37,6 @@
           <div class="video-preview-metadata-container">
             <div class="channel-title">{{ video.channelTitle }}</div>
             <div class="view-and-time">{{ video.viewCount }} views • {{ publishedAt }}</div>
-            <!-- <div class="show-max-two-lines">{{ video.description }}</div> -->
           </div>
         </div>
       </v-card-subtitle>
@@ -58,16 +63,18 @@ export default {
       textArea.innerHTML = str;
       return textArea.value;
     },
-    toggleWatched() {
-      this.watched = !this.watched;
+    setWatched(watchedState) {
+      this.video.watched = watchedState;
+      this.$pouch.put(this.video).then(res => (this.video._rev = res._rev));
+      this.componentKey += 1;
     },
-    onClick() {
-      this.watched = true;
+    toggleWatched() {
+      this.setWatched(!this.video.watched);
     }
   },
   data: () => ({
     transparent: "rgba(255, 255, 255, 0)",
-    watched: false
+    componentKey: 0
   })
 };
 </script>
@@ -120,6 +127,7 @@ export default {
   overflow: hidden;
   line-height: 1.4em;
   max-height: 2.8em;
+  min-height: 2.8em;
   text-overflow: ellipsis;
 }
 
