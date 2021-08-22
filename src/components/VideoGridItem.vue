@@ -1,9 +1,10 @@
+
 <template>
-  <v-hover v-slot:default="{hover}">
+  <v-hover v-slot:default="{ hover }">
     <v-card
       width="210px"
       flat
-      :class="{watched: video.watched}"
+      :class="{ watched: video.watched }"
       class="d-inline-block mr-2"
       :key="componentKey"
     >
@@ -15,14 +16,18 @@
                 <v-btn
                   icon
                   @click.prevent.stop="toggleWatched"
-                  :title="video.watched?'mark as unwatched':'mark as watched'"
+                  :title="
+                    video.watched ? 'mark as unwatched' : 'mark as watched'
+                  "
                 >
-                  <v-icon :class="{'show-btns': hover}" :color="transparent">mdi-check</v-icon>
+                  <v-icon :class="{ 'show-btns': hover }" :color="transparent"
+                    >mdi-check</v-icon
+                  >
                 </v-btn>
               </div>
             </v-row>
-            <div class="time-label" :class="{'hidden': hover}">
-              <span>12:34</span>
+            <div class="time-label" :class="{ hidden: hover }">
+              <span>{{ duration }}</span>
             </div>
           </v-card-title>
         </v-img>
@@ -36,7 +41,9 @@
           ></div>
           <div class="video-preview-metadata-container">
             <div class="channel-title">{{ video.channelTitle }}</div>
-            <div class="view-and-time">{{ video.viewCount }} views • {{ publishedAt }}</div>
+            <div class="view-and-time">
+              {{ viewCount }} views • {{ publishedAt }}
+            </div>
           </div>
         </div>
       </v-card-subtitle>
@@ -46,6 +53,7 @@
 
 <script>
 import { format } from "timeago.js";
+import ytDurationFormat from "youtube-duration-format";
 
 export default {
   props: ["video"],
@@ -53,9 +61,30 @@ export default {
     publishedAt() {
       return format(this.video.publishedAt);
     },
+    duration() {
+      return ytDurationFormat(this.video.duration);
+    },
+    viewCount() {
+      const number = this.video.viewCount
+      const SI_SYMBOL = ["", "k", "M", "G", "T", "P", "E"];
+      const tier = (Math.log10(Math.abs(number)) / 3) | 0;
+
+      // if zero, we don't need a suffix
+      if (tier == 0) return number;
+
+      // get suffix and determine scale
+      const suffix = SI_SYMBOL[tier];
+      const scale = Math.pow(10, tier * 3);
+
+      // scale the number
+      const scaled = number / scale;
+
+      // format number and add suffix
+      return scaled.toFixed(1) + suffix;
+    },
     url() {
       return `https://www.youtube.com/watch?v=${this.video._id}`;
-    }
+    },
   },
   methods: {
     unescape(str) {
@@ -65,17 +94,17 @@ export default {
     },
     setWatched(watchedState) {
       this.video.watched = watchedState;
-      this.$pouch.put(this.video).then(res => (this.video._rev = res._rev));
+      this.$pouch.put(this.video).then((res) => (this.video._rev = res._rev));
       this.componentKey += 1;
     },
     toggleWatched() {
       this.setWatched(!this.video.watched);
-    }
+    },
   },
   data: () => ({
     transparent: "rgba(255, 255, 255, 0)",
-    componentKey: 0
-  })
+    componentKey: 0,
+  }),
 };
 </script>
 <style scoped>

@@ -8496,3 +8496,8 @@ yorkie@^2.0.0:
     is-ci "^1.0.10"
     normalize-path "^1.0.0"
     strip-indent "^2.0.0"
+
+youtube-duration-format@^0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/youtube-duration-format/-/youtube-duration-format-0.2.0.tgz#5a32d5ad7354bd9bf9c70bd78558ca70328d9fe2"
+  integrity sha1-WjLVrXNUvZv5xwvXhVjKcDKNn+I=
