@@ -1,0 +1,49 @@
+# save etags for first page (and maxResults)
+
+
+
+###
+# Subscriptions 
+
+# curl \
+#   'https://youtube.googleapis.com/youtube/v3/subscriptions?part=snippet%2CcontentDetails&maxResults=50&mine=true&fields=etag%2CnextPageToken%2Citems(snippet(title%2Cdescription%2CresourceId%2FchannelId%2Cthumbnails%2Fmedium%2Furl))&key=[YOUR_API_KEY]' \
+#   --header 'Authorization: Bearer [YOUR_ACCESS_TOKEN]' \
+#   --header 'Accept: application/json' \
+#   --compressed
+
+GET https://youtube.googleapis.com/youtube/v3/subscriptions?part=snippet&maxResults=50&mine=true&fields=etag%2CnextPageToken%2Citems(snippet(title%2CresourceId%2FchannelId))&key={{$dotenv API_KEY}}
+content-type: application/json
+
+###
+# Channel
+
+# curl \
+#   'https://youtube.googleapis.com/youtube/v3/channels?part=contentDetails%2Cstatistics&id=UCC-UOdK8-mIjxBQm_ot1T-Q&fields=items(id%2CcontentDetails%2FrelatedPlaylists%2Fuploads%2Cstatistics%2FsubscriberCount)&key=[YOUR_API_KEY]' \
+#   --header 'Authorization: Bearer [YOUR_ACCESS_TOKEN]' \
+#   --header 'Accept: application/json' \
+#   --compressed
+
+GET https://youtube.googleapis.com/youtube/v3/channels?part=snippet%2CcontentDetails&id=UCs5Y5_7XK8HLDX0SLNwkd3w%2CUCC-UOdK8-mIjxBQm_ot1T-Q&fields=items(id%2Csnippet(title%2Cdescription%2Cthumbnails%2Fmedium%2Furl)%2CcontentDetails%2FrelatedPlaylists%2Fuploads)&key={{$dotenv API_KEY}}
+content-type: application/json
+
+###
+# PlaylistItems
+#
+# curl \
+#   'https://youtube.googleapis.com/youtube/v3/playlistItems?part=snippet%2CcontentDetails%2Cstatus&playlistId=UUC-UOdK8-mIjxBQm_ot1T-Q&fields=etag%2Citems(snippet(channelId%2CpublishedAt%2Ctitle%2Cdescription%2Cthumbnails%2Fmedium%2Furl)%2CcontentDetails(videoId%2CvideoPublishedAt))&key=[YOUR_API_KEY]' \
+#   --header 'Authorization: Bearer [YOUR_ACCESS_TOKEN]' \
+#   --header 'Accept: application/json' \
+#   --compressed
+
+GET https://youtube.googleapis.com/youtube/v3/playlistItems?part=snippet%2CcontentDetails%2Cstatus&playlistId=UUC-UOdK8-mIjxBQm_ot1T-Q&key={{$dotenv API_KEY}}
+content-type: application/json
+if-none-match: PxVAgVhtQQ-54UGnLEI7Y6d7dEI
+
+###
+# Videos
+#
+# curl \
+#   'https://youtube.googleapis.com/youtube/v3/videos?part=contentDetails%2Cstatistics&id=jWpJqOra_Jk&fields=kind%2CnextPageToken%2Citems(id%2Csnippet(channelId%2CpublishedAt%2Ctitle%2Cdescription%2Cthumbnails%2Fmedium%2Furl)%2CcontentDetails%2Fduration%2Cstatistics%2FviewCount)&key=[YOUR_API_KEY]' \
+#   --header 'Authorization: Bearer [YOUR_ACCESS_TOKEN]' \
+#   --header 'Accept: application/json' \
+#   --compressed
