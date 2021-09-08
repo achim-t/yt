@@ -35,7 +35,7 @@ content-type: application/json
 #   --header 'Accept: application/json' \
 #   --compressed
 
-GET https://youtube.googleapis.com/youtube/v3/playlistItems?part=snippet%2CcontentDetails%2Cstatus&playlistId=UUC-UOdK8-mIjxBQm_ot1T-Q&key={{$dotenv API_KEY}}
+GET https://youtube.googleapis.com/youtube/v3/playlistItems?part=snippet%2CcontentDetails%2Cstatus&playlistId=UUC-UOdK8-mIjxBQm_ot1T-Q&maxResults=10&key={{$dotenv API_KEY}}
 content-type: application/json
 if-none-match: PxVAgVhtQQ-54UGnLEI7Y6d7dEI
 
@@ -47,3 +47,4 @@ if-none-match: PxVAgVhtQQ-54UGnLEI7Y6d7dEI
 #   --header 'Authorization: Bearer [YOUR_ACCESS_TOKEN]' \
 #   --header 'Accept: application/json' \
 #   --compressed
+GET https://youtube.googleapis.com/youtube/v3/videos?part=snippet%2CcontentDetails%2Cstatus&id=_vtNYkEsoyc&key={{$dotenv API_KEY}}

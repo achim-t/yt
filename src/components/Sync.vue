@@ -3,20 +3,27 @@
 import axios from "axios";
 
 export default {
-  async created() {
-    await this.getChannels();
-    // await this.getVideos("UCxthdj6BtozwYyvhKa4cgSQ");
-    // for (const channel of this.channels) {
-    //await this.getVideos(this.channels[0]);
-    // }
-    // await this.testGetVideo("UC0intLFzLaudFG-xAvUEO-A");
+  created() {
+    this.sync()
   },
   methods: {
+    async sync(){
+      await this.getChannels()
+      const channels = await this.$pouch.find({
+        selector: { kind: "youtube#channel" },
+      })
+      const videoIds = (await Promise.all(channels.docs.map(channel => this.getVideos(channel))))
+      // eslint-disable-next-line no-debugger
+      debugger
+      const batchedVideoIds = []
+      while (videoIds.length) batchedVideoIds.push(videoIds.splice(0, 50).join(","))
+      await Promise.all(batchedVideoIds.map((ids) => this.getVideoDetailsFromId(ids)))
+    },
     async getChannelDetails(ids) {
       const params = {
         part: "contentDetails",
         id: ids,
-        fields: "items(id,contentDetails/relatedPlaylists/uploads)",
+        fields: "items(kind,id,contentDetails/relatedPlaylists/uploads)",
         key: localStorage.API_KEY,
       };
 
@@ -26,7 +33,8 @@ export default {
       );
       
       for (const item of response.data.items) {
-        const channel = await this.$pouch.get(item.id)
+        const id = `${item.kind}#${item.id}`
+        const channel = await this.$pouch.get(id)
         channel.playlistId =
           item.contentDetails.relatedPlaylists.uploads;
         await this.$pouch.put(channel)
@@ -62,29 +70,22 @@ export default {
           };
           delete channel.thumbnails;
           delete channel.resourceId;
-          channel._id = channel.channelId;
+          channel._id = `${channel.kind}#${channel.channelId}`;
           channel.sortTitle = channel.title.toUpperCase();
           return channel;
         });
         channels.push(...currChannels);
       } while (typeof params.pageToken !== "undefined");
-      // eslint-disable-next-line no-unused-vars
-      const responses = await Promise.all(
-        channels.map((channel) =>{
-          this.$pouch.get(channel._id).catch(() => this.$pouch.put(channel))
-          }
-        )
-      );
-      // eslint-disable-next-line no-debugger
-      debugger
-      /*if (responses) {
-      const channelIds = responses.map((response) => response.id);
-      const batchedChannelIds = [];
-      while (channelIds.length)
-        batchedChannelIds.push(channelIds.splice(0, 50).join(","));
-      await Promise.all(
-        batchedChannelIds.map((ids) => this.getChannelDetails(ids))
-      );}*/
+      const responses = await this.$pouch.bulkDocs(channels)
+      const channelIds = responses.filter((response) => response.ok).map(response => response.id.split('#')[2])
+      if (channelIds.length) {
+        const batchedChannelIds = [];
+        while (channelIds.length)
+          batchedChannelIds.push(channelIds.splice(0, 50).join(","));
+        await Promise.all(
+          batchedChannelIds.map((ids) => this.getChannelDetails(ids))
+        );
+      }
     },
     removeEmptyParams(params) {
       for (let p in params) {
@@ -94,28 +95,11 @@ export default {
       }
       return params;
     },
-    async getVideoDetails(video) {
-      const id = video._id;
-      const { duration, viewCount } = await this.getVideoDetailsFromId(id);
-      video = {
-        ...video,
-        duration,
-        viewCount,
-      };
-      return video;
-    },
-    async testGetVideo(channelId) {
-      const result = await this.$pouch.find({
-        selector: { channelId: { $eq: channelId }, kind: "youtube#channel" },
-      });
-      const channel = result.docs[0];
-      await this.getVideos(channel);
-    },
     async getVideoDetailsFromId(id) {
       const params = {
         part: "statistics,contentDetails",
         id,
-        fields: "items(contentDetails/duration,statistics/viewCount)",
+        fields: "items(kind,id,contentDetails/duration,statistics/viewCount)",
         key: localStorage.API_KEY,
       };
       const response = await axios.get(
@@ -124,9 +108,13 @@ export default {
           params: this.removeEmptyParams(params),
         }
       );
-      const duration = response.data.items[0].contentDetails.duration;
-      const viewCount = response.data.items[0].statistics.viewCount;
-      return { duration, viewCount };
+      for (const item of response.data.items) {
+        const id = `${item.kind}#${item.id}`
+        const video = await this.$pouch.get(id)
+        video.duration = item.contentDetails.duration
+        video.viewCount = item.statistics.viewCount
+        await this.$pouch.put(video)
+      }
     },
     async getVideos(channel) {
       const { playlistId, etag } = channel;
@@ -150,29 +138,34 @@ export default {
           },
         }
       );
-      if (response.status == 304) return;
-
-      for (const item of response.data.items) {
+      if (response.status == 304) return [];
+      const videos = response.data.items.map((item) =>{
         let video = {
-          _id: item.snippet.resourceId.videoId,
+          videoId: item.snippet.resourceId.videoId,
           kind: item.snippet.resourceId.kind,
           ...item.snippet,
           thumbnail: item.snippet.thumbnails.medium.url,
           publishedAt: item.contentDetails.videoPublishedAt,
-        };
+        }
+        video._id = `${video.kind}#${video.videoId}`
         delete video.thumbnails;
         delete video.resourceId;
-        video = await this.getVideoDetails(video);
-        this.$pouch.get(video._id).catch(() => this.$pouch.put(video));
-        // if (!channel.lastVideoDate) {
-        //   channel.lastVideoDate = video.publishedAt;
-        //   this.$pouch.put(channel).then(res => {
-        //     channel._rev = res._rev;
-        //   });
-        // }
-      }
+        return video
+      })
       channel.etag = response.data.etag;
-      await this.$pouch.put(channel);
+      await this.$pouch.put(channel).catch(()=> {
+        // eslint-disable-next-line no-console
+        console.log("channel error: " + channel)
+      });
+      const responses = await this.$pouch.bulkDocs(videos).catch(() => {
+        // eslint-disable-next-line no-console
+        console.log(videos)
+      })
+      const videoIds = 
+        responses
+          .filter((response) => response.ok)
+          .map(response => response.id)
+      return videoIds
     },
   },
   pouch: {

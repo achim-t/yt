@@ -62,6 +62,7 @@ export default {
       return format(this.video.publishedAt);
     },
     duration() {
+      if (!this.video.duration) return ""
       return ytDurationFormat(this.video.duration);
     },
     viewCount() {
